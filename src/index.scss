@@ -297,219 +297,204 @@ header {
       line-height: 24px;
     }
 
-<<<<<<< HEAD
-    ;
-  }
+    .container-xl {
+      .course-title-lockup {
+        font-size: 1.125rem;
+      }
 
-  ;
+      ;
 
-  .container-xl {
-    .course-title-lockup {
-      font-size: 1.125 rem;
+      .logo {
+        margin-top: 2px;
+      }
+
+      ;
     }
 
     ;
-=======
-  .container-xl {
-    .course-title-lockup {
+
+    span:first-child {
+      font-size: 14px;
+      margin-top: 1px !important;
+      margin-bottom: -1px !important;
+    }
+
+    ;
+  }
+
+  #courseTabsNavigation {
+    font-size: 18px;
+    font-family: Inter, Helvetica Neue, Arial, sans-serif;
+
+    .container-xl {
+      padding-left: 31px;
       font-size: 1.125rem;
-    };
->>>>>>> 7b000f1974f67a8c91205d028a96c70729a7eea5
 
-    .logo {
-      margin-top: 2px;
+      .nav {
+        line-height: 28px;
+      }
+
+      .nav-item {
+        padding-bottom: 8px;
+      }
     }
 
     ;
   }
 
-  ;
-
-  span:first-child {
-    font-size: 14px;
-    margin-top: 1px !important;
-    margin-bottom: -1px !important;
+  .min-content-height {
+    min-height: 80vh;
   }
 
-  ;
-}
-
-#courseTabsNavigation {
-  font-size: 18px;
-  font-family: Inter, Helvetica Neue, Arial, sans-serif;
-
-  .container-xl {
-    padding-left: 31px;
-    font-size: 1.125rem;
-
-    .nav {
-      line-height: 28px;
-    }
-
-    .nav-item {
-      padding-bottom: 8px;
-    }
+  .header-action-bar {
+    background-color: #fff;
+    z-index: 2;
+    box-shadow: 0px 2px 4px rgb(0 0 0 / 15%), 0px 2px 8px rgb(0 0 0 / 15%);
+    position: sticky;
+    top: 0;
   }
 
-  ;
-}
-
-.min-content-height {
-  min-height: 80vh;
-}
-
-.header-action-bar {
-  background-color: #fff;
-  z-index: 2;
-  box-shadow: 0px 2px 4px rgb(0 0 0 / 15%), 0px 2px 8px rgb(0 0 0 / 15%);
-  position: sticky;
-  top: 0;
-}
-
-.breadcrumb-menu {
-  z-index: 1;
-}
-
-.actions-dropdown {
-  z-index: 1;
-}
-
-.discussion-topic-group:last-of-type .divider {
-  display: none;
-}
-
-.zindex-5000 {
-  z-index: 5000;
-}
-
-#paragon-portal-root .pgn__modal-layer {
-  z-index: 5000 !important;
-}
-
-#iconbutton-tooltip-top {
-  z-index: 0;
-}
-
-.btn-icon.btn-icon-primary:hover {
-  background-color: #F2F0EF !important;
-  color: #00262B !important
-}
-
-
-@media only screen and (max-width: 767px) {
-  body:not(.tox-force-desktop) .tox .tox-dialog {
-    align-self: center;
+  .breadcrumb-menu {
+    z-index: 1;
   }
-}
 
-.tox .tox-editor-header {
-  z-index: 0 !important;
-}
+  .actions-dropdown {
+    z-index: 1;
+  }
 
-.badge {
-  padding: 1px 5px !important;
-}
+  .discussion-topic-group:last-of-type .divider {
+    display: none;
+  }
 
-.pgn__checkpoint {
-  max-width: 340px !important;
-<<<<<<< HEAD
-}
-=======
-}
+  .zindex-5000 {
+    z-index: 5000;
+  }
 
-.post-card-padding {
-  padding: 24px 24px 10px 24px;
-}
+  #paragon-portal-root .pgn__modal-layer {
+    z-index: 5000 !important;
+  }
 
-.post-card-margin {
-  margin: 24px 24px 0px 24px;
-}
+  #iconbutton-tooltip-top {
+    z-index: 0;
+  }
 
-.hover-card {
-  height: 36px;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15), 0px 4px 10px rgba(0, 0, 0, 0.15);
-  border-radius: 3px;
-  background: #FFFFFF;
-  max-width: fit-content;
-  margin-left: auto;
-  margin-top: -2.063rem;
-  z-index: 1;
-  right: 32px;
-}
+  .btn-icon.btn-icon-primary:hover {
+    background-color: #F2F0EF !important;
+    color: #00262B !important
+  }
 
-.response-editor-position {
-  margin-top: 50px !important;
-}
 
-.hover-button:hover {
-  background-color: #F2F0EF !important;
-  height: 36px;
-  border: none;
-}
-
-.btn-tertiary:hover {
-  background-color: #F2F0EF;
-}
-
-.btn-tertiary:disabled {
-  color: #454545;
-  background-color: transparent;
-}
-
-.disable-div {
-  pointer-events: none;
-}
-
-.on-focus:focus-within {
-  outline: 2px solid black;
-}
-
-.html-loader p:last-child {
-  margin-bottom: 0px;
-}
-
-.post-card-comment {
-  outline: none;
-
-  &:not(:hover),
-  &:not(:focus) {
-    .hover-card {
-      display: none;
+  @media only screen and (max-width: 767px) {
+    body:not(.tox-force-desktop) .tox .tox-dialog {
+      align-self: center;
     }
   }
 
-  &:hover,
-  &:focus-within {
-    .hover-card {
-      display: flex;
+  .tox .tox-editor-header {
+    z-index: 0 !important;
+  }
+
+  .badge {
+    padding: 1px 5px !important;
+  }
+
+  .pgn__checkpoint {
+    max-width: 340px !important;
+  }
+
+  .post-card-padding {
+    padding: 24px 24px 10px 24px;
+  }
+
+  .post-card-margin {
+    margin: 24px 24px 0px 24px;
+  }
+
+  .hover-card {
+    height: 36px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15), 0px 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+    background: #FFFFFF;
+    max-width: fit-content;
+    margin-left: auto;
+    margin-top: -2.063rem;
+    z-index: 1;
+    right: 32px;
+  }
+
+  .response-editor-position {
+    margin-top: 50px !important;
+  }
+
+  .hover-button:hover {
+    background-color: #F2F0EF !important;
+    height: 36px;
+    border: none;
+  }
+
+  .btn-tertiary:hover {
+    background-color: #F2F0EF;
+  }
+
+  .btn-tertiary:disabled {
+    color: #454545;
+    background-color: transparent;
+  }
+
+  .disable-div {
+    pointer-events: none;
+  }
+
+  .on-focus:focus-within {
+    outline: 2px solid black;
+  }
+
+  .html-loader p:last-child {
+    margin-bottom: 0px;
+  }
+
+  .post-card-comment {
+    outline: none;
+
+    &:not(:hover),
+    &:not(:focus) {
+      .hover-card {
+        display: none;
+      }
+    }
+
+    &:hover,
+    &:focus-within {
+      .hover-card {
+        display: flex;
+      }
     }
   }
-}
 
-.spinner-dimentions {
-  height: 24px;
-  width: 24px;
-}
+  .spinner-dimentions {
+    height: 24px;
+    width: 24px;
+  }
 
-.MJX-TEX {
-  white-space: normal;
-}
+  .MJX-TEX {
+    white-space: normal;
+  }
 
-.font-style {
-  font-family: "Inter";
-  font-style: normal;
-}
+  .font-style {
+    font-family: "Inter";
+    font-style: normal;
+  }
 
-.in-context-navbar {
-  line-height: 44px;
-}
+  .in-context-navbar {
+    line-height: 44px;
+  }
 
-.line-height-24 {
-  line-height: 24px;
-}
+  .line-height-24 {
+    line-height: 24px;
+  }
 
-.comments-sort {
-  margin-bottom: -44px;
-  z-index: 1;
+  .comments-sort {
+    margin-bottom: -44px;
+    z-index: 1;
+  }
 }
->>>>>>> 7b000f1974f67a8c91205d028a96c70729a7eea5
