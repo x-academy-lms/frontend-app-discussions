@@ -1,10 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import classNames from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 
+import { getConfig } from '@edx/frontend-platform';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { Hyperlink, useToggle } from '@edx/paragon';
 
@@ -13,6 +14,7 @@ import { ContentActions } from '../../../data/constants';
 import { selectorForUnitSubsection, selectTopicContext } from '../../../data/selectors';
 import { AlertBanner, Confirmation } from '../../common';
 import { DiscussionContext } from '../../common/context';
+import HoverCard from '../../common/HoverCard';
 import { selectModerationSettings } from '../../data/selectors';
 import { selectTopic } from '../../topics/data/selectors';
 import { removeThread, updateExistingThread } from '../data/thunks';
@@ -26,12 +28,13 @@ function Post({
   post,
   preview,
   intl,
+  handleAddResponseButton,
 }) {
   const location = useLocation();
   const history = useHistory();
   const dispatch = useDispatch();
   const { enableInContextSidebar } = useContext(DiscussionContext);
-  const { courseId } = useSelector((state) => state.courseTabs);
+  const courseId = useSelector((state) => state.config.id);
   const topic = useSelector(selectTopic(post.topicId));
   const getTopicSubsection = useSelector(selectorForUnitSubsection);
   const topicContext = useSelector(selectTopicContext(post.topicId));
@@ -40,13 +43,13 @@ function Post({
   const [isReporting, showReportConfirmation, hideReportConfirmation] = useToggle(false);
   const [isClosing, showClosePostModal, hideClosePostModal] = useToggle(false);
 
-  const handleAbusedFlag = () => {
+  const handleAbusedFlag = useCallback(() => {
     if (post.abuseFlagged) {
       dispatch(updateExistingThread(post.id, { flagged: !post.abuseFlagged }));
     } else {
       showReportConfirmation();
     }
-  };
+  }, [dispatch, post.abuseFlagged, post.id, showReportConfirmation]);
 
   const handleDeleteConfirmation = async () => {
     await dispatch(removeThread(post.id));
@@ -62,7 +65,7 @@ function Post({
     hideReportConfirmation();
   };
 
-  const actionHandlers = {
+  const actionHandlers = useMemo(() => ({
     [ContentActions.EDIT_CONTENT]: () => history.push({
       ...location,
       pathname: `${location.pathname}/edit`,
@@ -80,14 +83,35 @@ function Post({
     [ContentActions.COPY_LINK]: () => { navigator.clipboard.writeText(`${window.location.origin}/${courseId}/posts/${post.id}`); },
     [ContentActions.PIN]: () => dispatch(updateExistingThread(post.id, { pinned: !post.pinned })),
     [ContentActions.REPORT]: () => handleAbusedFlag(),
-  };
+  }), [
+    showDeleteConfirmation,
+    history,
+    location,
+    post.closed,
+    post.id,
+    post.pinned,
+    reasonCodesEnabled,
+    dispatch,
+    showClosePostModal,
+    courseId,
+    handleAbusedFlag,
+  ]);
 
   const getTopicCategoryName = topicData => (
     topicData.usageKey ? getTopicSubsection(topicData.usageKey)?.displayName : topicData.categoryId
   );
 
+  const getTopicInfo = topicData => (
+    getTopicCategoryName(topicData) ? `${getTopicCategoryName(topicData)} / ${topicData.name}` : `${topicData.name}`
+  );
+
   return (
-    <div className="d-flex flex-column w-100 mw-100" data-testid={`post-${post.id}`}>
+    <div
+      className="d-flex flex-column w-100 mw-100 post-card-comment"
+      data-testid={`post-${post.id}`}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex="0"
+    >
       <Confirmation
         isOpen={isDeleting}
         title={intl.formatMessage(messages.deletePostTitle)}
@@ -107,21 +131,32 @@ function Post({
           confirmButtonVariant="danger"
         />
       )}
+      <HoverCard
+        commentOrPost={post}
+        actionHandlers={actionHandlers}
+        handleResponseCommentButton={handleAddResponseButton}
+        addResponseCommentButtonMessage={intl.formatMessage(messages.addResponse)}
+        onLike={() => dispatch(updateExistingThread(post.id, { voted: !post.voted }))}
+        onFollow={() => dispatch(updateExistingThread(post.id, { following: !post.following }))}
+        isClosedPost={post.closed}
+      />
       <AlertBanner content={post} />
-      <PostHeader post={post} actionHandlers={actionHandlers} />
-      <div className="d-flex mt-4 mb-2 text-break font-style-normal text-primary-500">
-        <HTMLLoader htmlNode={post.renderedBody} id="post" />
+      <PostHeader post={post} />
+      <div className="d-flex mt-14px text-break font-style text-primary-500">
+        <HTMLLoader htmlNode={post.renderedBody} componentId="post" cssClassName="html-loader" testId={post.id} />
       </div>
-      {topicContext && topic && (
-        <div className={classNames('border px-3 rounded mb-4 border-light-400 align-self-start py-2.5',
-          { 'w-100': enableInContextSidebar })}
+      {(topicContext || topic) && (
+        <div
+          className={classNames('mt-14px mb-1 font-style font-size-12',
+            { 'w-100': enableInContextSidebar })}
+          style={{ lineHeight: '20px' }}
         >
-          <span className="text-gray-500">{intl.formatMessage(messages.relatedTo)}{' '}</span>
+          <span className="text-gray-500" style={{ lineHeight: '20px' }}>{intl.formatMessage(messages.relatedTo)}{' '}</span>
           <Hyperlink
-            destination={topicContext.unitLink}
+            destination={topicContext ? topicContext.unitLink : `${getConfig().BASE_URL}/${courseId}/topics/${post.topicId}`}
             target="_top"
           >
-            {enableInContextSidebar
+            {(topicContext && !topic)
               ? (
                 <>
                   <span className="w-auto">{topicContext.chapterName}</span>
@@ -131,13 +166,11 @@ function Post({
                   <span className="w-auto">{topicContext.unitName}</span>
                 </>
               )
-              : `${getTopicCategoryName(topic)} / ${topic.name}`}
+              : getTopicInfo(topic)}
           </Hyperlink>
         </div>
       )}
-      <div className="mb-3">
-        <PostFooter post={post} preview={preview} />
-      </div>
+      <PostFooter post={post} preview={preview} />
       <ClosePostReasonModal
         isOpen={isClosing}
         onCancel={hideClosePostModal}
@@ -154,6 +187,7 @@ Post.propTypes = {
   intl: intlShape.isRequired,
   post: postShape.isRequired,
   preview: PropTypes.bool,
+  handleAddResponseButton: PropTypes.func.isRequired,
 };
 
 Post.defaultProps = {

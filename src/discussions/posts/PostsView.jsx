@@ -13,10 +13,7 @@ import { fetchCourseTopicsV3 } from '../in-context-topics/data/thunks';
 import { selectTopics } from '../topics/data/selectors';
 import { fetchCourseTopics } from '../topics/data/thunks';
 import { handleKeyDown } from '../utils';
-import {
-  selectAllThreads,
-  selectTopicThreads,
-} from './data/selectors';
+import { selectAllThreads, selectTopicThreads } from './data/selectors';
 import { setSearchQuery } from './data/slices';
 import PostFilterBar from './post-filter-bar/PostFilterBar';
 import PostsList from './PostsList';
@@ -40,7 +37,7 @@ function CategoryPostsList({ category }) {
   const groupedCategory = useSelector(selectCurrentCategoryGrouping)(category);
   // If grouping at subsection is enabled, only apply it when browsing discussions in context in the learning MFE.
   const topicIds = useSelector(selectTopicsUnderCategory)(enableInContextSidebar ? groupedCategory : category);
-  const posts = useSelector(selectTopicThreads(topicIds));
+  const posts = useSelector(enableInContextSidebar ? selectAllThreads : selectTopicThreads(topicIds));
   return <PostsList posts={posts} topics={topicIds} />;
 }
 

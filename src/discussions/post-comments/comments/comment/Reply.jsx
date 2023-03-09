@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,16 +7,16 @@ import * as timeago from 'timeago.js';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { Avatar, useToggle } from '@edx/paragon';
 
-import HTMLLoader from '../../../components/HTMLLoader';
-import { AvatarOutlineAndLabelColors, ContentActions } from '../../../data/constants';
+import HTMLLoader from '../../../../components/HTMLLoader';
+import { AvatarOutlineAndLabelColors, ContentActions } from '../../../../data/constants';
 import {
   ActionsDropdown, AlertBanner, AuthorLabel, Confirmation,
-} from '../../common';
-import timeLocale from '../../common/time-locale';
-import { useAlertBannerVisible } from '../../data/hooks';
-import { selectAuthorAvatars } from '../../posts/data/selectors';
-import { editComment, removeComment } from '../data/thunks';
-import messages from '../messages';
+} from '../../../common';
+import timeLocale from '../../../common/time-locale';
+import { useAlertBannerVisible } from '../../../data/hooks';
+import { selectAuthorAvatars } from '../../../posts/data/selectors';
+import { editComment, removeComment } from '../../data/thunks';
+import messages from '../../messages';
 import CommentEditor from './CommentEditor';
 import { commentShape } from './proptypes';
 
@@ -31,13 +31,13 @@ function Reply({
   const [isDeleting, showDeleteConfirmation, hideDeleteConfirmation] = useToggle(false);
   const [isReporting, showReportConfirmation, hideReportConfirmation] = useToggle(false);
 
-  const handleAbusedFlag = () => {
+  const handleAbusedFlag = useCallback(() => {
     if (reply.abuseFlagged) {
       dispatch(editComment(reply.id, { flagged: !reply.abuseFlagged }));
     } else {
       showReportConfirmation();
     }
-  };
+  }, [dispatch, reply.abuseFlagged, reply.id, showReportConfirmation]);
 
   const handleDeleteConfirmation = () => {
     dispatch(removeComment(reply.id));
@@ -49,7 +49,7 @@ function Reply({
     hideReportConfirmation();
   };
 
-  const actionHandlers = {
+  const actionHandlers = useMemo(() => ({
     [ContentActions.EDIT_CONTENT]: () => setEditing(true),
     [ContentActions.ENDORSE]: () => dispatch(editComment(
       reply.id,
@@ -58,13 +58,14 @@ function Reply({
     )),
     [ContentActions.DELETE]: showDeleteConfirmation,
     [ContentActions.REPORT]: () => handleAbusedFlag(),
-  };
+  }), [dispatch, handleAbusedFlag, reply.endorsed, reply.id, showDeleteConfirmation]);
+
   const authorAvatars = useSelector(selectAuthorAvatars(reply.author));
   const colorClass = AvatarOutlineAndLabelColors[reply.authorLabel];
   const hasAnyAlert = useAlertBannerVisible(reply);
 
   return (
-    <div className="d-flex flex-column mt-4.5" data-testid={`reply-${reply.id}`} role="listitem">
+    <div className="d-flex flex-column mt-2.5 " data-testid={`reply-${reply.id}`} role="listitem">
       <Confirmation
         isOpen={isDeleting}
         title={intl.formatMessage(messages.deleteCommentTitle)}
@@ -108,11 +109,18 @@ function Reply({
           />
         </div>
         <div
-          className="bg-light-300 px-4 pb-2 pt-2.5 flex-fill"
+          className="bg-light-300 pl-4 pt-2.5 pr-2.5 pb-10px flex-fill"
           style={{ borderRadius: '0rem 0.375rem 0.375rem' }}
         >
-          <div className="d-flex flex-row justify-content-between align-items-center mb-0.5">
-            <AuthorLabel author={reply.author} authorLabel={reply.authorLabel} labelColor={colorClass && `text-${colorClass}`} linkToProfile />
+          <div className="d-flex flex-row justify-content-between" style={{ height: '24px' }}>
+            <AuthorLabel
+              author={reply.author}
+              authorLabel={reply.authorLabel}
+              labelColor={colorClass && `text-${colorClass}`}
+              linkToProfile
+              postCreatedAt={reply.createdAt}
+              postOrComment
+            />
             <div className="ml-auto d-flex">
               <ActionsDropdown
                 commentOrPost={{
@@ -120,16 +128,21 @@ function Reply({
                   postType,
                 }}
                 actionHandlers={actionHandlers}
+                iconSize="inline"
               />
             </div>
           </div>
           {isEditing
             ? <CommentEditor comment={reply} onCloseEditor={() => setEditing(false)} />
-            : <HTMLLoader componentId="reply" htmlNode={reply.renderedBody} cssClassName="text-primary-500" />}
+            : (
+              <HTMLLoader
+                componentId="reply"
+                htmlNode={reply.renderedBody}
+                cssClassName="html-loader text-break font-style text-primary-500"
+                testId={reply.id}
+              />
+            )}
         </div>
-      </div>
-      <div className="text-gray-500 align-self-end mt-2" title={reply.createdAt}>
-        {timeago.format(reply.createdAt, 'time-locale')}
       </div>
     </div>
   );

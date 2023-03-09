@@ -5,9 +5,7 @@ import { generatePath, useRouteMatch } from 'react-router';
 
 import { getConfig } from '@edx/frontend-platform';
 import {
-  CheckCircle,
-  CheckCircleOutline,
-  Delete, Edit, Pin, QuestionAnswer, Report, Verified, VerifiedOutline,
+  CheckCircle, CheckCircleOutline, Delete, Edit, Pin, QuestionAnswer, Report, Verified, VerifiedOutline,
 } from '@edx/paragon/icons';
 
 import { InsertLink } from '../components/icons';
@@ -185,7 +183,6 @@ export function useActions(content) {
         .every(condition => condition === true)
       : true
   );
-
   return ACTIONS_LIST.filter(
     ({
       action,
@@ -294,4 +291,8 @@ export function handleKeyDown(event) {
   if (selectedOption) {
     selectedOption.focus();
   }
+}
+
+export function isLastElementOfList(list, element) {
+  return list[list.length - 1] === element;
 }

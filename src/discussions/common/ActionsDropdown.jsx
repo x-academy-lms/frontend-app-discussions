@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { useSelector } from 'react-redux';
@@ -11,53 +11,68 @@ import {
 import { MoreHoriz } from '@edx/paragon/icons';
 
 import { ContentActions } from '../../data/constants';
-import { commentShape } from '../comments/comment/proptypes';
 import { selectBlackoutDate } from '../data/selectors';
 import messages from '../messages';
+import { commentShape } from '../post-comments/comments/comment/proptypes';
 import { postShape } from '../posts/post/proptypes';
 import { inBlackoutDateRange, useActions } from '../utils';
-import { DiscussionContext } from './context';
 
 function ActionsDropdown({
   intl,
   commentOrPost,
   disabled,
   actionHandlers,
+  iconSize,
+  dropDownIconSize,
 }) {
+  const buttonRef = useRef();
   const [isOpen, open, close] = useToggle(false);
   const [target, setTarget] = useState(null);
   const actions = useActions(commentOrPost);
-  const { enableInContextSidebar } = useContext(DiscussionContext);
-  const handleActions = (action) => {
+
+  const handleActions = useCallback((action) => {
     const actionFunction = actionHandlers[action];
     if (actionFunction) {
       actionFunction();
     } else {
       logError(`Unknown or unimplemented action ${action}`);
     }
-  };
+  }, [actionHandlers]);
+
   const blackoutDateRange = useSelector(selectBlackoutDate);
   // Find and remove edit action if in blackout date range.
   if (inBlackoutDateRange(blackoutDateRange)) {
     actions.splice(actions.findIndex(action => action.id === 'edit'), 1);
   }
+
+  const onClickButton = useCallback(() => {
+    setTarget(buttonRef.current);
+    open();
+  }, [open]);
+
+  const onCloseModal = useCallback(() => {
+    close();
+    setTarget(null);
+  }, [close]);
+
   return (
     <>
       <IconButton
-        onClick={open}
+        onClick={onClickButton}
         alt={intl.formatMessage(messages.actionsAlt)}
         src={MoreHoriz}
         iconAs={Icon}
         disabled={disabled}
-        size="sm"
-        ref={setTarget}
+        size={iconSize}
+        ref={buttonRef}
+        iconClassNames={dropDownIconSize ? 'dropdown-icon-dimentions' : ''}
       />
       <div className="actions-dropdown">
         <ModalPopup
-          onClose={close}
+          onClose={onCloseModal}
           positionRef={target}
           isOpen={isOpen}
-          placement={enableInContextSidebar ? 'left' : 'auto-start'}
+          placement="bottom-end"
         >
           <div
             className="bg-white p-1 shadow d-flex flex-column"
@@ -66,7 +81,7 @@ function ActionsDropdown({
             {actions.map(action => (
               <React.Fragment key={action.id}>
                 {(action.action === ContentActions.DELETE)
-              && <Dropdown.Divider />}
+                  && <Dropdown.Divider />}
 
                 <Dropdown.Item
                   as={Button}
@@ -94,10 +109,14 @@ ActionsDropdown.propTypes = {
   commentOrPost: PropTypes.oneOfType([commentShape, postShape]).isRequired,
   disabled: PropTypes.bool,
   actionHandlers: PropTypes.objectOf(PropTypes.func).isRequired,
+  iconSize: PropTypes.string,
+  dropDownIconSize: PropTypes.bool,
 };
 
 ActionsDropdown.defaultProps = {
   disabled: false,
+  iconSize: 'sm',
+  dropDownIconSize: false,
 };
 
 export default injectIntl(ActionsDropdown);

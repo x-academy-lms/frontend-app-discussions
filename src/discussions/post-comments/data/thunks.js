@@ -74,11 +74,21 @@ function normaliseComments(data) {
   };
 }
 
-export function fetchThreadComments(threadId, { page = 1, endorsed = EndorsementStatus.DISCUSSION } = {}) {
+export function fetchThreadComments(
+  threadId,
+  {
+    page = 1,
+    reverseOrder,
+    endorsed = EndorsementStatus.DISCUSSION,
+    enableInContextSidebar,
+  } = {},
+) {
   return async (dispatch) => {
     try {
       dispatch(fetchCommentsRequest());
-      const data = await getThreadComments(threadId, { page, endorsed });
+      const data = await getThreadComments(threadId, {
+        page, reverseOrder, endorsed, enableInContextSidebar,
+      });
       dispatch(fetchCommentsSuccess({
         ...normaliseComments(camelCaseObject(data)),
         endorsed,
@@ -137,7 +147,7 @@ export function editComment(commentId, comment, action = null) {
   };
 }
 
-export function addComment(comment, threadId, parentId = null) {
+export function addComment(comment, threadId, parentId = null, enableInContextSidebar = false) {
   return async (dispatch) => {
     try {
       dispatch(postCommentRequest({
@@ -145,7 +155,7 @@ export function addComment(comment, threadId, parentId = null) {
         threadId,
         parentId,
       }));
-      const data = await postComment(comment, threadId, parentId);
+      const data = await postComment(comment, threadId, parentId, enableInContextSidebar);
       dispatch(postCommentSuccess(camelCaseObject(data)));
     } catch (error) {
       if (getHttpErrorStatus(error) === 403) {

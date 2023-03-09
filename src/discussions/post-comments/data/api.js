@@ -16,6 +16,8 @@ export const getCommentsApiUrl = () => `${getConfig().LMS_BASE_URL}/api/discussi
  * @param {EndorsementStatus} endorsed
  * @param {number=} page
  * @param {number=} pageSize
+ * @param reverseOrder
+ * @param enableInContextSidebar
  * @returns {Promise<{}>}
  */
 export async function getThreadComments(
@@ -23,6 +25,8 @@ export async function getThreadComments(
     endorsed,
     page,
     pageSize,
+    reverseOrder,
+    enableInContextSidebar = false,
   } = {},
 ) {
   const params = snakeCaseObject({
@@ -30,7 +34,9 @@ export async function getThreadComments(
     endorsed: EndorsementValue[endorsed],
     page,
     pageSize,
+    reverseOrder,
     requestedFields: 'profile_image',
+    enableInContextSidebar,
   });
 
   const { data } = await getAuthenticatedHttpClient()
@@ -67,11 +73,14 @@ export async function getCommentResponses(
  * @param {string} comment Raw comment data to post.
  * @param {string} threadId Thread ID for thread in which to post comment.
  * @param {string=} parentId ID for a comments parent.
+ * @param {boolean} enableInContextSidebar
  * @returns {Promise<{}>}
  */
-export async function postComment(comment, threadId, parentId = null) {
+export async function postComment(comment, threadId, parentId = null, enableInContextSidebar = false) {
   const { data } = await getAuthenticatedHttpClient()
-    .post(getCommentsApiUrl(), snakeCaseObject({ threadId, raw_body: comment, parentId }));
+    .post(getCommentsApiUrl(), snakeCaseObject({
+      threadId, raw_body: comment, parentId, enableInContextSidebar,
+    }));
   return data;
 }
 
